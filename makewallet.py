@@ -50,8 +50,11 @@ def write_wallet_data(name, private_key_enc_bytes, chaincode, public_key, privac
             with open(filename, "w") as f:
                 json.dump(data, f)
         else:
-            with open(filename, "r") as file:
-                data = json.load(file)
+            try:
+                with open(filename, "r") as file:
+                    data = json.load(file)
+            except json.JSONDecodeError as e:
+                raise ValueError(f"Invalid JSON in wallet file {filename}: {e}") from e
             if "wallet" not in data:
                 data["wallet"] = {}
 
@@ -110,6 +113,9 @@ def _parse_args() -> argparse.Namespace:
 
     if args.password is None:
         args.password = getpass.getpass("Enter encryption password: ")
+
+    if args.seed is not None and len(args.seed) != 64:
+        parser.error("Seed must be 64 bytes (128 hex characters)")
 
     return args
 

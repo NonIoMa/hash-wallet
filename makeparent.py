@@ -40,8 +40,11 @@ def main() -> None:
 
     # load wallet master key
     wallet_file = os.path.join(".", f"{args.name}.json")
-    with open(wallet_file, "r") as f:
-        wallet_data = json.load(f)
+    try:
+        with open(wallet_file, "r") as f:
+            wallet_data = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        raise ValueError(f"Unable to load wallet file {wallet_file}: {e}") from e
     wallet = wallet_data.get("wallet", {})
     master_entry = wallet.get("master")
     if master_entry is None:

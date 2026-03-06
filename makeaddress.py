@@ -20,25 +20,8 @@ from bip32_utils import derive_child_private_key, derive_path, parse_index, priv
 
 def hash160(data: bytes) -> bytes:
     return hashlib.new('ripemd160', hashlib.sha256(data).digest()).digest()
-    """Return a human-readable address for ``pubkey`` of ``addr_type``.
 
-    Supported types:
-    * ``p2pkh`` – legacy Base58Pay‑to‑Public‑Key‑Hash
-    * ``p2wpkh`` / ``bip-84`` – native SegWit Bech32
-    """
-    match addr_type:
-        case 'p2pkh':
-            h160 = hash160(pubkey)
-            versioned = b'\x00' + h160
-            checksum = hashlib.sha256(hashlib.sha256(versioned).digest()).digest()[:4]
-            return base58.b58encode(versioned + checksum).decode()
-        case 'p2wpkh' | 'bip-84':
-            h160 = hash160(pubkey)
-            converted = convertbits(h160, 8, 5)
-            return bech32_encode("bc", [0] + converted)
-        case _:
-            raise ValueError(f"Unsupported address type: {addr_type}")
-def parse_index(component: str):
+def public_key_to_address(pubkey: bytes, addr_type: str) -> str:
     # convert a path component (e.g. 44' or 0) into integer index
     if component == 'm' or component == '' or component is None:
         return None
@@ -130,8 +113,11 @@ def main() -> None:
 
     # load wallet
     wallet_file = os.path.join(".", f"{args.name}.json")
-    with open(wallet_file, "r") as f:
-        wallet_data = json.load(f)
+    try:
+        with open(wallet_file, "r") as f:
+            wallet_data = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        raise ValueError(f"Unable to load wallet file {wallet_file}: {e}") from e
     wallet = wallet_data.get("wallet", {})
     master_entry = wallet.get("master")
     if master_entry is None:
