@@ -1,0 +1,75 @@
+"""Parent key derivation utility for hash-wallet.
+
+This tool reads the master key from an existing wallet JSON file, decrypts it
+with a password, derives a parent private key using the supplied BIP32 path,
+and stores the parent entry in the wallet. The parent key and its chaincode
+are encrypted with a second password for later use when deriving address keys.
+"""
+
+import argparse
+import json
+import os
+import hmac
+import hashlib
+from ecdsa import SECP256k1, SigningKey
+from ecdsa.util import number_to_string
+from crypto_utils import encrypt_private_key, decrypt_private_key
+from bip32_utils import derive_path, private_key_to_public_key
+def _parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Derive a parent key for a wallet")
+    parser.add_argument("name", help="Wallet name")
+    parser.add_argument(
+        "path",
+        help="BIP32 derivation path for the parent key, e.g. m/84'/0'/0'/0"
+    )
+    parser.add_argument("password_root", help="Password used to decrypt the master private key")
+    parser.add_argument("password_parent", help="Password used to encrypt the derived parent key")
+    args = parser.parse_args()
+
+    return args
+def main() -> None:
+    args = _parse_args()
+
+    print()
+    print("Name:", args.name)
+    print("ID:", args.path)
+    print("(root/parent passwords suppressed)")
+    print()
+
+
+
+    # load wallet master key
+    wallet_file = os.path.join(".", f"{args.name}.json")
+    with open(wallet_file, "r") as f:
+        wallet_data = json.load(f)
+    wallet = wallet_data.get("wallet", {})
+    master_entry = wallet.get("master")
+    if master_entry is None:
+        raise ValueError("wallet file does not contain wallet.master")
+    master_priv_enc = bytes.fromhex(master_entry["private-key-enc"])
+    master_chaincode = bytes.fromhex(master_entry["chaincode"])
+    # decrypt master private key using the root password
+    try:
+        master_priv = decrypt_private_key(master_priv_enc, args.password_root)
+    except Exception as exc:  # cryptography throws InvalidTag on auth failure
+        raise ValueError("unable to decrypt master private key - bad root password?") from exc
+
+    # derive child private key and chaincode for this path
+    child_priv, child_chaincode = derive_path(master_priv, master_chaincode, args.path)
+
+    # compute data for the parent entry
+    pubkey = private_key_to_public_key(child_priv)
+    entry = {
+        "public-key": pubkey.hex(),
+        "chaincode": child_chaincode.hex(),
+        "private-key-enc": encrypt_private_key(child_priv, args.password_parent).hex(),
+    }
+    # find next available parent slot
+    wallet[args.path] = entry
+    wallet_data["wallet"] = wallet
+    with open(wallet_file, "w") as f:
+        json.dump(wallet_data, f, indent=2)
+
+    print(f"Added parent at {args.path} to {wallet_file}")
+if __name__ == "__main__":
+    main()

@@ -3,12 +3,11 @@ import json
 import hmac
 import argparse
 import hashlib
+import getpass
 from mnemonic import Mnemonic
 from ecdsa import SECP256k1, SigningKey
 from ecdsa.util import number_to_string
-
-# helper functions for key encryption/decryption
-from crypto_utils import encrypt_private_key, decrypt_private_key
+from crypto_utils import encrypt_private_key
 
 def private_key_to_public_key(privkey: bytes, curve_order: int) -> bytes:
     """Convert private key to compressed public key."""
@@ -31,7 +30,7 @@ def seed_to_master_key(seed: bytes):
     """Derive master key and chain code from BIP32 seed."""
     I = hmac.new(BITCOIN_SEED, seed, hashlib.sha512).digest()
     return I[:32], I[32:]  # (privkey, chaincode)
-def write_wallet_data(name, private_key_enc_bytes, chaincode, public_key, reset):
+def write_wallet_data(name, private_key_enc_bytes, chaincode, public_key, privacy, reset):
     """Write wallet data to JSON file.
 
     ``private_key_enc_bytes`` is the encrypted form produced by
@@ -41,18 +40,20 @@ def write_wallet_data(name, private_key_enc_bytes, chaincode, public_key, reset)
     filename = os.path.join(".", f"{name}.json")
     if not os.path.exists(filename):
         # create an empty wallet file
-        data = {}
+        data = {"wallet": {}}
         with open(filename, "w") as f:
             json.dump(data, f)
     else:
         if reset:
             # create an empty wallet file
-            data = {}
+            data = {"wallet": {}}
             with open(filename, "w") as f:
                 json.dump(data, f)
         else:
             with open(filename, "r") as file:
                 data = json.load(file)
+            if "wallet" not in data:
+                data["wallet"] = {}
 
     if not isinstance(data, dict):
         raise ValueError(f"wallet file {filename} does not contain an object")
@@ -61,9 +62,10 @@ def write_wallet_data(name, private_key_enc_bytes, chaincode, public_key, reset)
         "private-key-enc": private_key_enc_bytes.hex(),
         "chaincode": chaincode.hex(),
         "public-key": public_key.hex(),
+        "privacy": privacy,
     }
     
-    data["m"] = entry
+    data["wallet"]["master"] = entry
     with open(filename, "w") as f:
         json.dump(data, f, indent=2)
 
@@ -91,7 +93,10 @@ def _parse_args() -> argparse.Namespace:
         "--passphrase", default="",
         help="Optional BIP39 passphrase (separate from encryption password)")
     parser.add_argument(
-        "password", help="Private key encryption password")
+        "password", nargs='?', help="Private key encryption password (will prompt if not provided)")
+    parser.add_argument(
+        "-p", "--privacy", type=int, default=1,
+        help="Privacy level: 0 heavy, 1 light, 2 none (default: 1)")
     parser.add_argument(
         "-r", "--reset", action="store_true",
         help="Reset the wallet file if it already exists")
@@ -102,6 +107,9 @@ def _parse_args() -> argparse.Namespace:
 
     if args.seed is not None and args.mnemonic is not None:
         parser.error("Cannot specify both seed and mnemonic phrase")
+
+    if args.password is None:
+        args.password = getpass.getpass("Enter encryption password: ")
 
     return args
 
@@ -124,6 +132,7 @@ def main() -> None:
             print("Passphrase: (hidden)")
     else:
         print("Seed:", seed.hex()[:16] + "...")
+    print("Privacy:", args.privacy)
     print("I wont print password, what did you expect ?")
     print("Reset:", args.reset)
     print()
@@ -136,7 +145,7 @@ def main() -> None:
     # encrypt master private key using the provided password
     private_key_enc_result = encrypt_private_key(private_key, args.password)
 
-    write_wallet_data(args.name, private_key_enc_result, chaincode, public_key, args.reset)
+    write_wallet_data(args.name, private_key_enc_result, chaincode, public_key, args.privacy, args.reset)
 
 
 if __name__ == "__main__":
