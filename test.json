@@ -20,10 +20,24 @@
         "public-key": "03cf56d2df3b3828fff7106176de1f555ecd50d3abaaa61790611b0d847156ea62",
         "currency": "btc",
         "type": "p2wpkh",
-        "address": "bc1qwz0g9m4f6w982gz42lkj3pu98cszny9u65dhej",
+        "address": "bc1qxdddwxwxh3dllclz529xd4d2vw6dpydteuuunh",
         "private-key-enc": "01bc8c6a6ff2d0693acb83ce775e6768052d088cf9c813b3f412f47d40ca6f24085ad74e641034f4708cda0193094cd268cc017fb1636e3d0173c44c11ef8bd30a399cb1639b6c73a63c6e84e6",
-        "balance": 0,
-        "transactions": []
+        "transactions": [
+          "20ed26045b6223eaeeaf7a70a40872d946c09bbed15f4a231aee93dfe3c170e0"
+        ],
+        "UTXO": [
+          {
+            "txid": "20ed26045b6223eaeeaf7a70a40872d946c09bbed15f4a231aee93dfe3c170e0",
+            "vout": 0,
+            "status": {
+              "confirmed": true,
+              "block_height": 938150,
+              "block_hash": "0000000000000000000192c31d103e45cc56aa7a2843c10defc38cbc689372b7",
+              "block_time": 1771950112
+            },
+            "value": 16734
+          }
+        ]
       }
     ]
   }

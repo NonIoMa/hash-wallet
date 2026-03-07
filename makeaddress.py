@@ -190,7 +190,7 @@ def main() -> None:
         "type": args.type,
         "address": address,
         "private-key-enc": encrypt_private_key(child_priv, args.password_address).hex(),
-        "balance": 0,
+        "UTXO": 0,
         "transactions": []
     }
 
