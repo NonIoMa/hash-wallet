@@ -11,12 +11,17 @@ import os
 import json
 import hmac
 import hashlib
+import sys
+from pathlib import Path
 import base58
 from bech32 import bech32_encode, convertbits
 from ecdsa import SECP256k1, SigningKey
 from ecdsa.util import number_to_string
-from crypto_utils import encrypt_private_key, decrypt_private_key
-from bip32_utils import derive_child_private_key, derive_path, parse_index, private_key_to_public_key
+
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
+from assets.crypto_utils import encrypt_private_key, decrypt_private_key
+from assets.bip32_utils import derive_child_private_key, derive_path, parse_index, private_key_to_public_key
 
 def hash160(data: bytes) -> bytes:
     return hashlib.new('ripemd160', hashlib.sha256(data).digest()).digest()
@@ -124,7 +129,7 @@ def main() -> None:
 
 
     # load wallet
-    wallet_file = os.path.join(".", f"{args.name}.json")
+    wallet_file = os.path.join("..", "wallets", args.name + ".json")
     try:
         with open(wallet_file, "r") as f:
             wallet_data = json.load(f)

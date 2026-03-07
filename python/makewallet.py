@@ -4,10 +4,15 @@ import hmac
 import argparse
 import hashlib
 import getpass
+from pathlib import Path
+import sys
 from mnemonic import Mnemonic
 from ecdsa import SECP256k1, SigningKey
+
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
 from ecdsa.util import number_to_string
-from crypto_utils import encrypt_private_key
+from assets.crypto_utils import encrypt_private_key
 
 def private_key_to_public_key(privkey: bytes, curve_order: int) -> bytes:
     """Convert private key to compressed public key."""
@@ -37,29 +42,29 @@ def write_wallet_data(name, private_key_enc_bytes, chaincode, public_key, privac
     :func:`crypto_utils.encrypt_private_key` and is stored in the wallet as
     hex.
     """
-    filename = os.path.join(".", f"{name}.json")
-    if not os.path.exists(filename):
+    wallet_file = os.path.join("..", "wallets", name + ".json")
+    if not os.path.exists(wallet_file):
         # create an empty wallet file
         data = {"wallet": {}}
-        with open(filename, "w") as f:
+        with open(wallet_file, "w") as f:
             json.dump(data, f)
     else:
         if reset:
             # create an empty wallet file
             data = {}
-            with open(filename, "w") as f:
+            with open(wallet_file, "w") as f:
                 json.dump(data, f)
         else:
             try:
-                with open(filename, "r") as file:
+                with open(wallet_file, "r") as file:
                     data = json.load(file)
             except json.JSONDecodeError as e:
-                raise ValueError(f"Invalid JSON in wallet file {filename}: {e}") from e
+                raise ValueError(f"Invalid JSON in wallet file {wallet_file}: {e}") from e
             if "wallet" not in data:
                 data["wallet"] = {}
 
     if not isinstance(data, dict):
-        raise ValueError(f"wallet file {filename} does not contain an object")
+        raise ValueError(f"wallet file {wallet_file} does not contain an object")
 
     entry = {
         "private-key-enc": private_key_enc_bytes.hex(),
@@ -69,10 +74,10 @@ def write_wallet_data(name, private_key_enc_bytes, chaincode, public_key, privac
     }
     
     data["wallet"]["master"] = entry
-    with open(filename, "w") as f:
+    with open(wallet_file, "w") as f:
         json.dump(data, f, indent=2)
 
-    print(f"created wallet file: {filename}")
+    print(f"created wallet file: {wallet_file}")
     return entry
 # the actual encryption helper is imported from crypto_utils.  We keep
 # this name around for backwards compatibility but its behaviour is just a

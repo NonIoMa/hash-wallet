@@ -3,7 +3,6 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
-
 def _derive_key(password: str, salt: bytes) -> bytes:
     """Derive a 256-bit key from a password using PBKDF2 (SHA-256)."""
     kdf = PBKDF2HMAC(
@@ -13,7 +12,6 @@ def _derive_key(password: str, salt: bytes) -> bytes:
         iterations=200_000,  # Increased for better security
     )
     return kdf.derive(password.encode('utf-8'))
-
 
 def encrypt_private_key(private_key: bytes, password: str) -> bytes:
     """Encrypt a 32-byte private key with a password.
@@ -39,7 +37,6 @@ def encrypt_private_key(private_key: bytes, password: str) -> bytes:
     # prefix with a version byte so we can upgrade format later
     # currently version 1; format: [1] || salt || nonce || ciphertext
     return b"\x01" + salt + nonce + ciphertext
-
 
 def decrypt_private_key(encrypted: bytes, password: str) -> bytes:
     """Decrypt data produced by :func:`encrypt_private_key`.

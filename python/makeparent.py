@@ -9,12 +9,14 @@ are encrypted with a second password for later use when deriving address keys.
 import argparse
 import json
 import os
-import hmac
-import hashlib
-from ecdsa import SECP256k1, SigningKey
-from ecdsa.util import number_to_string
-from crypto_utils import encrypt_private_key, decrypt_private_key
-from bip32_utils import derive_path, private_key_to_public_key
+
+from pathlib import Path
+import sys
+
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
+from assets.crypto_utils import encrypt_private_key, decrypt_private_key
+from assets.bip32_utils import derive_path, private_key_to_public_key
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Derive a parent key for a wallet")
     parser.add_argument("name", help="Wallet name")
@@ -39,7 +41,7 @@ def main() -> None:
 
 
     # load wallet master key
-    wallet_file = os.path.join(".", f"{args.name}.json")
+    wallet_file = os.path.join("..", "wallets", args.name + ".json")
     try:
         with open(wallet_file, "r") as f:
             wallet_data = json.load(f)

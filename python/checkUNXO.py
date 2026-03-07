@@ -1,8 +1,15 @@
 import requests
 import json
 import os
+import argparse
 
-file = "./test.json"
+parser = argparse.ArgumentParser(description="Check UTXOs for all addresses in a wallet")
+parser.add_argument("name", help="Wallet name")
+
+args = parser.parse_args()
+
+
+file = os.path.join("..", "wallets", args.name + ".json")
 
 with open(file, "r") as f:
     wallet_data = json.load(f)
