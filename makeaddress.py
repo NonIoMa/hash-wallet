@@ -20,17 +20,33 @@ from bip32_utils import derive_child_private_key, derive_path, parse_index, priv
 
 def hash160(data: bytes) -> bytes:
     return hashlib.new('ripemd160', hashlib.sha256(data).digest()).digest()
-
 def public_key_to_address(pubkey: bytes, addr_type: str) -> str:
-    # convert a path component (e.g. 44' or 0) into integer index
-    if component == 'm' or component == '' or component is None:
-        return None
-    hardened = component.endswith("'")
-    num = component[:-1] if hardened else component
-    idx = int(num)
-    if hardened:
-        idx |= 0x80000000
-    return idx
+    if addr_type == 'p2pkh':
+        version = b'\x00'  # mainnet
+        
+        hash160_pub = hash160(pubkey)
+        version_hash = version + hash160_pub
+        
+        checksum = hashlib.sha256(
+            hashlib.sha256(version_hash).digest()
+        ).digest()[:4]
+        
+        address = base58.b58encode(version_hash + checksum).decode()
+        return address
+
+    elif addr_type in ['p2wpkh', 'bip-84']:
+        hash160_pub = hash160(pubkey)
+
+        # convert to 5 bit
+        witness_program = convertbits(hash160_pub, 8, 5)
+
+        # prepend witness version
+        address = bech32_encode('bc', [0] + witness_program)
+
+        return address
+
+    else:
+        raise ValueError(f"Unsupported address type: {addr_type}")
 def derive_child_private_key(parent_privkey: bytes, parent_chaincode: bytes, index: int) -> tuple[bytes, bytes]:
     """Derive a single BIP32 child private key.
 
@@ -75,29 +91,25 @@ def derive_path(master_priv: bytes, master_chaincode: bytes, path: str) -> tuple
     
     Returns a tuple (child_privkey, child_chaincode).
     """
-    priv = master_priv
     chaincode = master_chaincode
     for comp in path.split("/"):
         idx = parse_index(comp)
         if idx is None:
             continue
-        priv, chaincode = derive_child_private_key(priv, chaincode, idx)
-    return priv, chaincode
-
-
+        master_priv, chaincode = derive_child_private_key(master_priv, chaincode, idx)
+    return master_priv, chaincode
 
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Derive a child address and add it to a wallet")
     parser.add_argument("name", help="Wallet name")
     parser.add_argument("path", help="BIP32 derivation path, e.g. m/84'/0'/0'/0/0")
+    parser.add_argument("currency", help="Currency (e.g. btc, eth)")
     parser.add_argument("type", help="Address type (p2pkh, p2wpkh, bip-84)")
-    parser.add_argument("password_root", help="Password used to decrypt the master private key")
     parser.add_argument("password_parent", help="Password used to decrypt the parent key")
     parser.add_argument("password_address", help="Password used to encrypt the derived address key")
     args = parser.parse_args()
 
     return args
-
 
 def main() -> None:
     args = _parse_args()
@@ -119,31 +131,23 @@ def main() -> None:
     except (FileNotFoundError, json.JSONDecodeError) as e:
         raise ValueError(f"Unable to load wallet file {wallet_file}: {e}") from e
     wallet = wallet_data.get("wallet", {})
-    master_entry = wallet.get("master")
-    if master_entry is None:
-        raise ValueError("wallet file does not contain wallet.master")
-    master_priv_enc = bytes.fromhex(master_entry["private-key-enc"])
-    master_chaincode = bytes.fromhex(master_entry["chaincode"])
-    # decrypt master private key using the root password
-    try:
-        master_priv = decrypt_private_key(master_priv_enc, args.password_root)
-    except Exception as exc:  # cryptography throws InvalidTag on auth failure
-        raise ValueError("unable to decrypt master private key - bad root password?") from exc
+    parent_entry = wallet.get("parents", [])
+    if parent_entry is None:
+        raise ValueError("wallet file does not contain wallet.parents")
 
     # derive child private key for this path
     # find parent entry - look for the longest matching parent path
-    parent_entry = None
     parent_path = None
-    for key in wallet.keys():
-        if key == "master":
-            continue
-        candidate = wallet.get(key)
-        # Check if this key is a parent (has chaincode) and matches our path
-        if isinstance(candidate, dict) and "chaincode" in candidate:
-            if args.path.startswith(key + "/"):
-                if parent_path is None or len(key) > len(parent_path):
-                    parent_entry = candidate
-                    parent_path = key
+    args_components = args.path.split("/")
+    for parent in parent_entry:
+        print (f"Checking parent entry with path {parent['path']} against args path {args.path}")
+        parent_components = parent["path"].split("/")
+        if len(parent_components) < len(args_components) and args.path.startswith(parent["path"]):
+            if parent_path is None or len(parent_components) > len(parent_path.split("/")):
+                parent_entry = parent
+                parent_path = parent["path"]
+                print(f"Found matching parent entry with path {parent_path}")
+                break
     
     if parent_entry is not None:
         # load and decrypt existing parent key
@@ -178,20 +182,25 @@ def main() -> None:
 
     # compute address and build entry
     pubkey = private_key_to_public_key(child_priv)
-    
+    address = public_key_to_address(pubkey, args.type)
     entry = {
+        "path": args.path,
         "public-key": pubkey.hex(),
+        "currency": args.currency,
         "type": args.type,
-        "address": public_key_to_address(pubkey, args.type),
-        # encrypt child private key with the address password before storing
+        "address": address,
         "private-key-enc": encrypt_private_key(child_priv, args.password_address).hex(),
-        "balance": 0,
+        "UTXO": 0,
         "transactions": []
     }
 
     # append entry to wallet data using path as key
-    wallet[args.path] = entry
-    wallet_data["wallet"] = wallet
+    if wallet_data["wallet"].get("addresses") is None:
+        wallet_data["wallet"]["addresses"] = []
+    for existing_entry in wallet_data["wallet"]["addresses"]:
+        if existing_entry["path"] == args.path and existing_entry["address"] == address:
+            raise ValueError(f"Address entry for path {args.path} already exists in wallet.")
+    wallet_data["wallet"]["addresses"].append(entry)
     with open(wallet_file, "w") as f:
         json.dump(wallet_data, f, indent=2)
 

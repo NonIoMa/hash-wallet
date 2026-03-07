@@ -1,0 +1,44 @@
+{
+  "wallet": {
+    "master": {
+      "private-key-enc": "010b73543e123e80c508c865838c815a7c3db185f99196fae2c206ca8946db91d561d8aa607b82459d8c5ec3905ce7847d13a87bd1b18db751e1f340d24ba03bd2a2fdb39b4ef9cd11aa9db454",
+      "chaincode": "b04edc63e1c8b7d51e0b3196a7edf5fbb2a45dac0ef29cab0146999f8774ce63",
+      "public-key": "031d0a9768ce1cc8dae676b99ad7f3f1472f9c3e85442c0413e3cfcad7ed379a24",
+      "privacy": 1
+    },
+    "parents": [
+      {
+        "path": "m/84'/0'/0'/0",
+        "public-key": "03aaf59fddec108d9864980bcd162e70d04a43da02a8291a7fbd10eb69553aeee4",
+        "chaincode": "2f910d17dab1887032500a688b01bd828304a18e8cfbc56306cfe2522a90dff7",
+        "private-key-enc": "01192fcbb9c1e201093fc51a030fd325a726c91f91459464daf85ccbc18f5166336db94683e73ce06602c4875a3f9b76bbcb6fcf44bc5e2a7c87922c2e944d328cabefa0bf860675a8d82654d5"
+      }
+    ],
+    "addresses": [
+      {
+        "path": "m/84'/0'/0'/0/0",
+        "public-key": "03cf56d2df3b3828fff7106176de1f555ecd50d3abaaa61790611b0d847156ea62",
+        "currency": "btc",
+        "type": "p2wpkh",
+        "address": "bc1qxdddwxwxh3dllclz529xd4d2vw6dpydteuuunh",
+        "private-key-enc": "01bc8c6a6ff2d0693acb83ce775e6768052d088cf9c813b3f412f47d40ca6f24085ad74e641034f4708cda0193094cd268cc017fb1636e3d0173c44c11ef8bd30a399cb1639b6c73a63c6e84e6",
+        "transactions": [
+          "20ed26045b6223eaeeaf7a70a40872d946c09bbed15f4a231aee93dfe3c170e0"
+        ],
+        "UTXO": [
+          {
+            "txid": "20ed26045b6223eaeeaf7a70a40872d946c09bbed15f4a231aee93dfe3c170e0",
+            "vout": 0,
+            "status": {
+              "confirmed": true,
+              "block_height": 938150,
+              "block_hash": "0000000000000000000192c31d103e45cc56aa7a2843c10defc38cbc689372b7",
+              "block_time": 1771950112
+            },
+            "value": 16734
+          }
+        ]
+      }
+    ]
+  }
+}

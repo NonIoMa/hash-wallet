@@ -63,13 +63,17 @@ def main() -> None:
     # compute data for the parent entry
     pubkey = private_key_to_public_key(child_priv)
     entry = {
+        "path": args.path,
         "public-key": pubkey.hex(),
         "chaincode": child_chaincode.hex(),
         "private-key-enc": encrypt_private_key(child_priv, args.password_parent).hex(),
     }
+    
     # find next available parent slot
-    wallet[args.path] = entry
-    wallet_data["wallet"] = wallet
+    
+    if wallet_data["wallet"].get("parents") is None:
+        wallet_data["wallet"]["parents"] = []
+    wallet_data["wallet"]["parents"].append(entry)
     with open(wallet_file, "w") as f:
         json.dump(wallet_data, f, indent=2)
 
