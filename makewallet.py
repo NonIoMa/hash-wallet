@@ -46,7 +46,7 @@ def write_wallet_data(name, private_key_enc_bytes, chaincode, public_key, privac
     else:
         if reset:
             # create an empty wallet file
-            data = {"wallet": {}}
+            data = {}
             with open(filename, "w") as f:
                 json.dump(data, f)
         else:
