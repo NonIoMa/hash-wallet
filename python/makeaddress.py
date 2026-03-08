@@ -25,33 +25,54 @@ from assets.bip32_utils import derive_child_private_key, derive_path, parse_inde
 
 def hash160(data: bytes) -> bytes:
     return hashlib.new('ripemd160', hashlib.sha256(data).digest()).digest()
-def public_key_to_address(pubkey: bytes, addr_type: str) -> str:
-    if addr_type == 'p2pkh':
-        version = b'\x00'  # mainnet
-        
-        hash160_pub = hash160(pubkey)
-        version_hash = version + hash160_pub
-        
-        checksum = hashlib.sha256(
-            hashlib.sha256(version_hash).digest()
-        ).digest()[:4]
-        
-        address = base58.b58encode(version_hash + checksum).decode()
-        return address
+def public_key_to_address(pubkey: bytes, currency: str, addr_type: str) -> str:
+    
+    if currency in ["btc", "btc_testnet"]:
 
-    elif addr_type in ['p2wpkh', 'bip-84']:
-        hash160_pub = hash160(pubkey)
+        if addr_type == 'p2pkh':
+            # version byte
+            if currency == "btc":
+                version = b'\x00'   # mainnet
+            else:
+                version = b'\x6f'   # testnet
 
-        # convert to 5 bit
-        witness_program = convertbits(hash160_pub, 8, 5)
+            hash160_pub = hash160(pubkey)
+            version_hash = version + hash160_pub
 
-        # prepend witness version
-        address = bech32_encode('bc', [0] + witness_program)
+            checksum = hashlib.sha256(
+                hashlib.sha256(version_hash).digest()
+            ).digest()[:4]
 
-        return address
+            address = base58.b58encode(version_hash + checksum).decode()
+            return address
 
+        elif addr_type in ['p2wpkh', 'bip-84']:
+            hash160_pub = hash160(pubkey)
+
+            witness_program = convertbits(hash160_pub, 8, 5)
+
+            hrp = "bc" if currency == "btc" else "tb"
+
+            address = bech32_encode(hrp, [0] + witness_program)
+            return address
+
+        else:
+            raise ValueError(f"Unsupported address type: {addr_type}")
+
+
+    # elif currency == "bch":
+
+    #     if addr_type == "p2pkh":
+    #         hash160_pub = hash160(pubkey)
+
+    #         version = 0  # P2PKH in CashAddr
+
+    #         payload = [version] + convertbits(hash160_pub, 8, 5)
+
+    #         address = cashaddr_encode("bitcoincash", payload)
+    #         return addres
     else:
-        raise ValueError(f"Unsupported address type: {addr_type}")
+        raise ValueError(f"Unsupported currency: {currency}")
 def derive_child_private_key(parent_privkey: bytes, parent_chaincode: bytes, index: int) -> tuple[bytes, bytes]:
     """Derive a single BIP32 child private key.
 
@@ -187,7 +208,7 @@ def main() -> None:
 
     # compute address and build entry
     pubkey = private_key_to_public_key(child_priv)
-    address = public_key_to_address(pubkey, args.type)
+    address = public_key_to_address(pubkey,args.currency, args.type)
     entry = {
         "path": args.path,
         "public-key": pubkey.hex(),

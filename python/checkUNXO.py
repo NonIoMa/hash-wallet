@@ -32,3 +32,4 @@ for addrEL in addresses:
 
 with open(file, "w") as f:
     json.dump(wallet_data, f, indent=2)
+    

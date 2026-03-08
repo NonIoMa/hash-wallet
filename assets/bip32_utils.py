@@ -92,3 +92,4 @@ def private_key_to_public_key(privkey: bytes) -> bytes:
     if vk.pubkey.point.y() % 2 != 0:
         pub = b'\x03' + number_to_string(vk.pubkey.point.x(), SECP256k1.order)
     return pub
+    
