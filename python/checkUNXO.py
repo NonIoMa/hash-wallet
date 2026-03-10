@@ -18,11 +18,14 @@ addresses = wallet_data["wallet"]["addresses"]
 
 for addrEL in addresses:
     address = addrEL["address"]
+    currency = addrEL["currency"]
 
     print(f"Checking {address}")
 
-    utxo_url = f"https://blockstream.info/api/address/{address}/utxo"
-    tx_url = f"https://blockstream.info/api/address/{address}/txs"
+    if (currency == "btc"): prefix = ''
+    elif (currency == "testnet4"): prefix = 'testnet4/'
+    utxo_url = f"https://mempool.space/{prefix}api/address/{address}/utxo"
+    tx_url = f"https://mempool.space/{prefix}api/address/{address}/utxo"
 
     utxos = requests.get(utxo_url).json()
     txs = requests.get(tx_url).json()
