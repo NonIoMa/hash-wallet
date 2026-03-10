@@ -12,6 +12,12 @@
         "public-key": "03aaf59fddec108d9864980bcd162e70d04a43da02a8291a7fbd10eb69553aeee4",
         "chaincode": "2f910d17dab1887032500a688b01bd828304a18e8cfbc56306cfe2522a90dff7",
         "private-key-enc": "01192fcbb9c1e201093fc51a030fd325a726c91f91459464daf85ccbc18f5166336db94683e73ce06602c4875a3f9b76bbcb6fcf44bc5e2a7c87922c2e944d328cabefa0bf860675a8d82654d5"
+      },
+      {
+        "path": "m/44'/0'/0'/0",
+        "public-key": "037e07a32e8d29ce65004d2dc65110bf6eec48fc0a4b85182d5868a7f0721b945b",
+        "chaincode": "4c1b1786e337a857ebf999f93e0d54c15c56b87e1326268448c57c2ed89d536f",
+        "private-key-enc": "01c1f3c16388ca5451ab93b8d37f87215f365c5cd19ce48485228f00a37dcefd097a28e1103b1d58d5b365c45038c1176f81e5e7a26eb2ba690b579923fa799c01163abff90e747364f24b9874"
       }
     ],
     "addresses": [
@@ -37,6 +43,174 @@
             },
             "value": 16734
           }
+        ]
+      },
+      {
+        "path": "m/84'/0'/0'/0/0",
+        "public-key": "03cf56d2df3b3828fff7106176de1f555ecd50d3abaaa61790611b0d847156ea62",
+        "currency": "testnet4",
+        "type": "p2wpkh",
+        "address": "tb1qwz0g9m4f6w982gz42lkj3pu98cszny9usjkyzp",
+        "private-key-enc": "01d179834d3ab99ff72f9590b651d359ac4a3e0fa6642cc6b1bf004db3d79b701f71a33002a9d623e3179120242737f3025696d7d7a68486e5e6b346015efb36ca98a673e17482d94bd7625b41",
+        "UTXO": [
+          {
+            "txid": "fccc2ff2bfa725da6e037d189d60698426f7bc631c66a5e88e01d2e9fa7a08fc",
+            "vout": 0,
+            "status": {
+              "confirmed": true,
+              "block_height": 125330,
+              "block_hash": "0000000000000001a1d70a17c3c20dddd08792d84b7eb0e17795675c61ec44d4",
+              "block_time": 1773005850
+            },
+            "value": 100000
+          },
+          {
+            "txid": "f8d10763036455d0b1754118790f9be24fa9ae898b7908cf964132263c912d9d",
+            "vout": 1,
+            "status": {
+              "confirmed": true,
+              "block_height": 125330,
+              "block_hash": "0000000000000001a1d70a17c3c20dddd08792d84b7eb0e17795675c61ec44d4",
+              "block_time": 1773005850
+            },
+            "value": 127124
+          },
+          {
+            "txid": "98db05198b340e1c8d98c0a70038616162328fafe647b5d613234fe97de9c911",
+            "vout": 0,
+            "status": {
+              "confirmed": true,
+              "block_height": 125330,
+              "block_hash": "0000000000000001a1d70a17c3c20dddd08792d84b7eb0e17795675c61ec44d4",
+              "block_time": 1773005850
+            },
+            "value": 100000
+          },
+          {
+            "txid": "db652b2f00dfcee2de23a6c93188ea3d8f118c5f707922e2c624d659d6104489",
+            "vout": 0,
+            "status": {
+              "confirmed": true,
+              "block_height": 125330,
+              "block_hash": "0000000000000001a1d70a17c3c20dddd08792d84b7eb0e17795675c61ec44d4",
+              "block_time": 1773005850
+            },
+            "value": 100000
+          },
+          {
+            "txid": "10db4d0315ed44828b8bcf177b02aba814592830f9388f79d279c01b83c2b2c3",
+            "vout": 0,
+            "status": {
+              "confirmed": true,
+              "block_height": 125330,
+              "block_hash": "0000000000000001a1d70a17c3c20dddd08792d84b7eb0e17795675c61ec44d4",
+              "block_time": 1773005850
+            },
+            "value": 100000
+          },
+          {
+            "txid": "1dff28033095229be7806f8d42775e7ea7f477290829135d33b51fe4e7146371",
+            "vout": 1,
+            "status": {
+              "confirmed": true,
+              "block_height": 125405,
+              "block_hash": "0000000000013a38b048425a99f3bdbd3fdf6013437c7645414e912bacb1f352",
+              "block_time": 1773080072
+            },
+            "value": 332012
+          },
+          {
+            "txid": "6bcbb1c710ca6b77e05adb545c7a6b5e6fbc1aa8502dc1b265c654960c328526",
+            "vout": 0,
+            "status": {
+              "confirmed": true,
+              "block_height": 125330,
+              "block_hash": "0000000000000001a1d70a17c3c20dddd08792d84b7eb0e17795675c61ec44d4",
+              "block_time": 1773005850
+            },
+            "value": 100000
+          },
+          {
+            "txid": "68868684edcd1d190afe7366efd089e39c7fd3559f59129f98f1d651801e9fb2",
+            "vout": 0,
+            "status": {
+              "confirmed": true,
+              "block_height": 125330,
+              "block_hash": "0000000000000001a1d70a17c3c20dddd08792d84b7eb0e17795675c61ec44d4",
+              "block_time": 1773005850
+            },
+            "value": 100000
+          },
+          {
+            "txid": "83592a41f0d1a1c0c99412ca162d5b3013495004559f79258128c3cad7e65e8e",
+            "vout": 0,
+            "status": {
+              "confirmed": true,
+              "block_height": 125330,
+              "block_hash": "0000000000000001a1d70a17c3c20dddd08792d84b7eb0e17795675c61ec44d4",
+              "block_time": 1773005850
+            },
+            "value": 100000
+          },
+          {
+            "txid": "1dd22660b822ee1c0b41cc6ae1675d86304ac6c2e3bf04301e97392804f1a885",
+            "vout": 0,
+            "status": {
+              "confirmed": true,
+              "block_height": 125330,
+              "block_hash": "0000000000000001a1d70a17c3c20dddd08792d84b7eb0e17795675c61ec44d4",
+              "block_time": 1773005850
+            },
+            "value": 100000
+          },
+          {
+            "txid": "b733ec23e5d0d732ae6405cdb16644febd761e785ee00ab17bc5de9e9a65af76",
+            "vout": 0,
+            "status": {
+              "confirmed": true,
+              "block_height": 125330,
+              "block_hash": "0000000000000001a1d70a17c3c20dddd08792d84b7eb0e17795675c61ec44d4",
+              "block_time": 1773005850
+            },
+            "value": 100000
+          },
+          {
+            "txid": "b9d734f7290c88fb19d411cd0879ec1cb63f46a5bab6597fc1904cd35978fc2d",
+            "vout": 0,
+            "status": {
+              "confirmed": true,
+              "block_height": 125330,
+              "block_hash": "0000000000000001a1d70a17c3c20dddd08792d84b7eb0e17795675c61ec44d4",
+              "block_time": 1773005850
+            },
+            "value": 100000
+          },
+          {
+            "txid": "9bc0a8cc1ac89a75f116d1c4c031d5bc21c4f22cfd3d91b2e624c8129d45fbf3",
+            "vout": 0,
+            "status": {
+              "confirmed": true,
+              "block_height": 125330,
+              "block_hash": "0000000000000001a1d70a17c3c20dddd08792d84b7eb0e17795675c61ec44d4",
+              "block_time": 1773005850
+            },
+            "value": 50000
+          }
+        ],
+        "transactions": [
+          "83592a41f0d1a1c0c99412ca162d5b3013495004559f79258128c3cad7e65e8e",
+          "f8d10763036455d0b1754118790f9be24fa9ae898b7908cf964132263c912d9d",
+          "1dff28033095229be7806f8d42775e7ea7f477290829135d33b51fe4e7146371",
+          "b733ec23e5d0d732ae6405cdb16644febd761e785ee00ab17bc5de9e9a65af76",
+          "98db05198b340e1c8d98c0a70038616162328fafe647b5d613234fe97de9c911",
+          "9bc0a8cc1ac89a75f116d1c4c031d5bc21c4f22cfd3d91b2e624c8129d45fbf3",
+          "68868684edcd1d190afe7366efd089e39c7fd3559f59129f98f1d651801e9fb2",
+          "db652b2f00dfcee2de23a6c93188ea3d8f118c5f707922e2c624d659d6104489",
+          "b9d734f7290c88fb19d411cd0879ec1cb63f46a5bab6597fc1904cd35978fc2d",
+          "1dd22660b822ee1c0b41cc6ae1675d86304ac6c2e3bf04301e97392804f1a885",
+          "fccc2ff2bfa725da6e037d189d60698426f7bc631c66a5e88e01d2e9fa7a08fc",
+          "6bcbb1c710ca6b77e05adb545c7a6b5e6fbc1aa8502dc1b265c654960c328526",
+          "10db4d0315ed44828b8bcf177b02aba814592830f9388f79d279c01b83c2b2c3"
         ]
       }
     ]
